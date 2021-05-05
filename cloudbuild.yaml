@@ -1,0 +1,20 @@
+steps:
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    args: [
+      'gcloud', 'functions', 'deploy', 'create_DLP_job',
+      '--runtime', 'python37',
+      '--trigger-resource', 'doc-staging-141223',
+      '--trigger-event', 'google.storage.object.finalize',
+      '--source', '.',
+      '--entry-point', 'create_DLP_job'
+    ]
+    waitFor: ["-"]
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    args: [
+      'gcloud', 'functions', 'deploy', 'resolve_DLP',
+      '--runtime', 'python37',
+      '--trigger-topic', 'new-document',
+      '--source', '.',
+      '--entry-point', 'resolve_DLP'
+    ]
+    waitFor: ["-"]
