@@ -76,6 +76,11 @@ def create_DLP_job(data, done):
     file_name = data["name"]
     print("Function triggered for file [{}]".format(file_name))
 
+    file_ext = file_name.split(".")[-1].lower()
+    if file_ext not in ["txt", "csv"]:
+        print(f"unsupported file extension: {file_ext}, must be .txt or .csv")
+        return
+
     # Prepare info_types by converting the list of strings (INFO_TYPES) into a list of dictionaries
     info_types = [{"name": info_type} for info_type in INFO_TYPES]
 
@@ -190,8 +195,16 @@ def deident_text(data, context):
 
     print("Function triggered for file [{}]".format(filename))
 
-    if filename.split(".")[-1].lower() not in ["txt", "csv"]:
+    file_ext = filename.split(".")[-1].lower()
+    if file_ext == "txt":
+        file_type = "TEXT_UTF8"
+    elif file_ext == "csv":
+        file_type = "CSV"
+    else:
+        print(f"unsupported file extension: {file_ext}, must be .txt or .csv")
         return
+
+    print(f"detected file type: {file_type}")
 
     info_types = [{"name": info_type} for info_type in INFO_TYPES]
     parent = f"projects/{PROJECT_ID}"
@@ -220,8 +233,9 @@ def deident_text(data, context):
     bucket = storage_client.get_bucket(SENSITIVE_BUCKET)
     blob = bucket.get_blob(filename)
     item = blob.download_as_bytes()
+    print(f"file: {filename} retrieved from bucket: {SENSITIVE_BUCKET}")
 
-    contentItem = {"byte_item": {"type_": 5, "data": item}}
+    contentItem = {"byte_item": {"type_": file_type, "data": item}}
     response = dlp.deidentify_content(
         request={
             "parent": parent,
