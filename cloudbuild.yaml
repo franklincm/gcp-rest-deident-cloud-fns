@@ -18,3 +18,12 @@ steps:
       '--entry-point', 'resolve_DLP'
     ]
     waitFor: ["-"]
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    args: [
+      'gcloud', 'functions', 'deploy', 'deident_text',
+      '--runtime', 'python37',
+      '--trigger-topic', 'new-sensitive-doc',
+      '--source', '.',
+      '--entry-point', 'deident_text'
+    ]
+    waitFor: ["-"]
