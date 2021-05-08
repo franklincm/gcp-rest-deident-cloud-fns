@@ -33,7 +33,7 @@ class TestCreateDLPJob(unittest.TestCase):
 
         resolve_DLP(data, None)
 
+        mocked_dlp.assert_called_with(request={"name": "test"})
         mocked_publisher.assert_called_with(
             "projects/gcp-rest-deident/topics/new-sensitive-doc", b"test-file.txt"
         )
-        mocked_dlp.assert_called_with(request={"name": "test"})
