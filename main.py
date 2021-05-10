@@ -17,17 +17,16 @@ Date:    October 2018
 
 """
 
-from google.cloud import dlp
-from google.cloud import storage
+from google.cloud.dlp import DlpServiceClient
+from google.cloud.storage import Client as StorageClient
 from google.cloud import pubsub
 import os
 import base64
 
 # Initialize the Google Cloud client libraries
-dlp = dlp.DlpServiceClient()
-storage_client = storage.Client()
-publisher = pubsub.PublisherClient()
-subscriber = pubsub.SubscriberClient()
+# dlp = dlp.DlpServiceClient()
+# storage_client = storage.Client()
+# publisher = pubsub.PublisherClient()
 
 
 # ----------------------------
@@ -72,6 +71,9 @@ def create_DLP_job(data, done):
     Returns:
         None. Debug information is printed to the log.
     """
+
+    dlp = DlpServiceClient()
+    
     # Get the targeted file in the quarantine bucket
     file_name = data["name"]
     print("Function triggered for file [{}]".format(file_name))
@@ -134,6 +136,11 @@ def resolve_DLP(data, context):
     Returns:
         None. Debug information is printed to the log.
     """
+
+    dlp = DlpServiceClient()
+    storage_client = StorageClient()
+    publisher = pubsub.PublisherClient()
+    
     # Get the targeted DLP job name that is created by the create_DLP_job function
     job_name = data["attributes"]["DlpJobName"]
     print("Received pub/sub notification from DLP job: {}".format(job_name))
@@ -204,6 +211,9 @@ def deident_text(data, context):
         print(f"unsupported file extension: {file_ext}, must be .txt or .csv")
         return
 
+    dlp = DlpServiceClient()
+    storage_client = StorageClient()
+    
     print(f"detected file type: {file_type}")
 
     info_types = [{"name": info_type} for info_type in INFO_TYPES]
